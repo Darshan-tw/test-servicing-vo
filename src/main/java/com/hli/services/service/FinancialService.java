@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.hli.services.constants.FinancialServicerequestConstants.SYSTEM_USER;
 import static com.hli.services.utils.FinancialServiceUtils.generateUUID;
@@ -79,8 +80,8 @@ public class FinancialService {
                 .maxSumAssured(sumAssured.multiply(maxSumAssuredMultiplicand))
                 .minTerm(planEntity.getMinTerm())
                 .maxTerm(planEntity.getMaxTerm())
-                .premiumTerm(memberDetailsEntity.getPremiumTerm())
-                .riskStartDate(riskStartDate)
+                .policyTerm(memberDetailsEntity.getPremiumTerm())
+                .riskCommencementDate(riskStartDate)
                 .build();
 
     }
@@ -104,7 +105,7 @@ public class FinancialService {
                 .build();
     }
 
-    public void createFinancialServiceRequest(CreateFinancialSRRequestBody request) {
+    public void createFinancialServiceRequest(CreateFinancialSRRequestBody request, List<MultipartFile> uploadedDocuments) {
         memberDetailsRepository.findByPolicyNumberAndMemberNumber(request.getPolicyNumber(), request.getMemberNumber()).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (request.getModifiedFields().size() == 1) {
@@ -120,7 +121,7 @@ public class FinancialService {
             }
         }
 
-        for (MultipartFile document  : request.getUploadedDocuments()) {
+        for (MultipartFile document  : uploadedDocuments) {
             saveDocument(request, document);
         }
     }

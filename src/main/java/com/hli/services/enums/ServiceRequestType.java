@@ -5,22 +5,22 @@ import lombok.Getter;
 
 @Getter
 public enum ServiceRequestType {
-    @JsonProperty("Gender")
+    @JsonProperty("gender")
     GENDER,
 
-    @JsonProperty("SumAssured")
+    @JsonProperty("sumAssured")
     SUM_ASSURED,
 
-    @JsonProperty("Title")
+    @JsonProperty("title")
     TITLE,
 
-    @JsonProperty("DateOfBirth")
+    @JsonProperty("dateOfBirth")
     DATE_OF_BIRTH,
 
-    @JsonProperty("PolicyTerm")
+    @JsonProperty("policyTerm")
     POLICY_TERM,
 
-    @JsonProperty("RiskCommencementDate")
+    @JsonProperty("riskCommencementDate")
     RISK_COMMENCEMENT_DATE
 
 }

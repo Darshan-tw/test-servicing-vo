@@ -24,6 +24,6 @@ public class LoanDetails {
     private BigDecimal maxSumAssured;
     private Integer minTerm;
     private Integer maxTerm;
-    private Integer premiumTerm;
-    private LocalDate riskStartDate;
+    private Integer policyTerm;
+    private LocalDate riskCommencementDate;
 }

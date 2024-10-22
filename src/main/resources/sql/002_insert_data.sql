@@ -22,7 +22,7 @@ insert into vo_member_details (member_number, address_line1, address_line2, addr
                                risk_start_date, risk_term, s_percentage, start_date, state, sum_assured,
                                sum_insured_type, title, top_up_premium, transaction_date, undecision_desc,
                                undecision_flag, updated_at, plan_number)
-values ('MEM001', 'Address 1', 'Address 2', 'Address 3', 33, 50, 'City A', '123e4567-e89b-12d3-a456-426614174000',
+values ('MEM001', '123 Main St', 'Anytown, ST 12345', 'Bengaluru', 33, 50, 'City A', '123e4567-e89b-12d3-a456-426614174000',
         'CLIENT001', 'COI001', 'Y', current_timestamp, 2, '1990-01-01', '2023-01-01', 'name@email.com', 'EMP001',
         500, 'John', 1, 'Male', 10000, 2000, 5, 'LAN001', 'Doe', 300000, '2023-01-01', 15, 'Single', 'Category A',
         'Active', 'Type A', TRUE, 'MPH001', 'Country A', 'Class A', 123, 'Partner A', 100, '1234567890', '123456',

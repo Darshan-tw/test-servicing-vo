@@ -28,6 +28,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -122,8 +123,8 @@ public class FinancialServiceTest {
         assertEquals(expectedMaxSumAssured, policyDetails.getLoanDetails().getMaxSumAssured());
         assertEquals(5, policyDetails.getLoanDetails().getMinTerm());
         assertEquals(20, policyDetails.getLoanDetails().getMaxTerm());
-        assertEquals(memberDetailsEntity.getPremiumTerm(), policyDetails.getLoanDetails().getPremiumTerm());
-        assertEquals(expectedRiskStartDate, policyDetails.getLoanDetails().getRiskStartDate());
+        assertEquals(memberDetailsEntity.getPremiumTerm(), policyDetails.getLoanDetails().getPolicyTerm());
+        assertEquals(expectedRiskStartDate, policyDetails.getLoanDetails().getRiskCommencementDate());
         assertEquals(memberDetailsEntity.getMemberNumber(), policyDetails.getMemberDetails().getMemberNumber());
         assertEquals(Title.Mr, policyDetails.getMemberDetails().getTitle());
         assertEquals(expectedName, policyDetails.getMemberDetails().getName());
@@ -168,8 +169,7 @@ public class FinancialServiceTest {
         modifiedField.setServiceRequestType(ServiceRequestType.GENDER);
         modifiedField.setNewValue(Gender.Male.toString());
         request.setModifiedFields(Collections.singletonList(modifiedField));
-        MultipartFile mockFile = mock(MultipartFile.class);
-        request.setUploadedDocuments(Collections.singletonList(mockFile));
+        List<MultipartFile> uploadedDocuments = Collections.singletonList(mock(MultipartFile.class));
         MemberDetailsEntity memberDetailsEntity = MemberDetailsEntity.builder()
                 .firstName("firstName")
                 .lastName("LastName")
@@ -191,10 +191,10 @@ public class FinancialServiceTest {
                 .addressLine3("near bakery")
                 .build();
 
-        when(mockFile.getOriginalFilename()).thenReturn("test.txt");
-        when(mockFile.getSize()).thenReturn(100L);
+        when(uploadedDocuments.getFirst().getOriginalFilename()).thenReturn("test.txt");
+        when(uploadedDocuments.getFirst().getSize()).thenReturn(100L);
         when(memberDetailsRepository.findByPolicyNumberAndMemberNumber(policyNumber, memberNo)).thenReturn(Optional.of(memberDetailsEntity));
-        financialService.createFinancialServiceRequest(request);
+        financialService.createFinancialServiceRequest(request, uploadedDocuments);
 
         verify(serviceRequestRepository, times(1)).save(any(ServiceRequestEntity.class));
         verify(documentRepository, times(1)).save(any(DocumentEntity.class));
@@ -205,11 +205,12 @@ public class FinancialServiceTest {
         String memberNo = "123";
         String policyNumber = "456";
         CreateFinancialSRRequestBody request = new CreateFinancialSRRequestBody();
+        List<MultipartFile> uploadedDocuments = Collections.singletonList(mock(MultipartFile.class));
         request.setPolicyNumber(policyNumber);
         request.setMemberNumber(memberNo);
         when(memberDetailsRepository.findByPolicyNumberAndMemberNumber(policyNumber, memberNo)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> financialService.createFinancialServiceRequest(request));
+        assertThrows(EntityNotFoundException.class, () -> financialService.createFinancialServiceRequest(request, uploadedDocuments));
     }
 
 }

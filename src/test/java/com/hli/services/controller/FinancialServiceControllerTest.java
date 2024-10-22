@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -52,12 +53,12 @@ public void setUp() {
         request.setPolicyNumber("POL001");
         request.setMemberNumber("MEM001");
         request.setModifiedFields(Collections.singletonList(new ModifiedFields()));
-        request.setUploadedDocuments(Collections.singletonList(mock(MultipartFile.class)));
+        List<MultipartFile> uploadedDocuments = Collections.singletonList(mock(MultipartFile.class));
 
-        doNothing().when(financialService).createFinancialServiceRequest(request);
+        doNothing().when(financialService).createFinancialServiceRequest(request, uploadedDocuments);
 
-        ResponseEntity<Void> response = financialServiceController.createFinancialServiceRequest(request);
+        ResponseEntity<Void> response = financialServiceController.createFinancialServiceRequest(request, uploadedDocuments);
 
-        verify(financialService, times(1)).createFinancialServiceRequest(request);
+        verify(financialService, times(1)).createFinancialServiceRequest(request, uploadedDocuments);
     }
 }
