@@ -1,7 +1,7 @@
 package com.hli.services.service;
 
 import com.hli.services.enums.*;
-import com.hli.services.exceptions.DuplicateServiceRequest;
+import com.hli.services.exceptions.DuplicateServiceRequestException;
 import com.hli.services.exceptions.EntityNotFoundException;
 import com.hli.services.exceptions.RequestValidationException;
 import com.hli.services.repository.DocumentRepository;
@@ -23,14 +23,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.hli.services.constants.FinancialServicerequestConstants.SYSTEM_USER;
-import static com.hli.services.utils.FinancialServiceUtils.generateUUID;
+import static com.hli.services.utils.ApplicationUtils.generateUUID;
+import static com.hli.services.utils.ApplicationUtils.isValidDate;
 
 @Slf4j
 @Service
@@ -111,7 +111,7 @@ public class FinancialService {
         if (request.getModifiedFields().size() == 1) {
             String serviceRequestType = request.getModifiedFields().getFirst().getServiceRequestType().name();
             if (isDuplicateServiceRequest(request, serviceRequestType)) {
-                throw new DuplicateServiceRequest(String.format("A pending service request already exists for the given policy number, member number for service request type: %s ", serviceRequestType));
+                throw new DuplicateServiceRequestException(String.format("A pending service request already exists for the given policy number, member number for service request type: %s ", serviceRequestType));
             }
             createNewServiceRequest(request, request.getModifiedFields().getFirst());
         }
@@ -194,6 +194,11 @@ public class FinancialService {
                     throw new RequestValidationException(ErrorCode.INVALID_REQUEST, "Invalid gender value: " + newValue);
                 }
                 break;
+            case TITLE:
+                if (!Arrays.asList("Mr", "Mrs", "Ms").contains(newValue)) {
+                    throw new RequestValidationException(ErrorCode.INVALID_REQUEST, "Invalid title value: " + newValue);
+                }
+                break;
             case DATE_OF_BIRTH:
             case RISK_COMMENCEMENT_DATE:
                 if (!isValidDate(newValue)) {
@@ -221,21 +226,9 @@ public class FinancialService {
     }
 
     private BigDecimal getOriginalLoanAmount(String policyNumber, String memberNumber) {
-        MemberDetailsEntity memberDetailsEntity = memberDetailsRepository.findByPolicyNumberAndMemberNumber(policyNumber, memberNumber).orElseThrow(() ->new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        MemberDetailsEntity memberDetailsEntity = memberDetailsRepository.findByPolicyNumberAndMemberNumber(policyNumber, memberNumber).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         return BigDecimal.valueOf(memberDetailsEntity.getLoanAmount());
     }
-
-    private boolean isValidDate(String dateStr) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        sdf.setLenient(false);
-        try {
-            java.util.Date date = sdf.parse(dateStr);
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
 
 
 }
